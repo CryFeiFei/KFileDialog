@@ -25,12 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        kfiledialog.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        kfiledialog.h \
         mainwindow.h
 
 FORMS += \
+        kfiledialog.ui \
         mainwindow.ui
 
