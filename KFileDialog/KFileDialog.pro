@@ -26,11 +26,13 @@ CONFIG += c++11
 
 SOURCES += \
         kfiledialog.cpp \
+        kfileitemmodel.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
         kfiledialog.h \
+        kfileitemmodel.h \
         mainwindow.h
 
 FORMS += \
