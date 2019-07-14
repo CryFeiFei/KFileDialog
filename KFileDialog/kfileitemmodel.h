@@ -31,15 +31,22 @@ public:
 	~KFileItemModel();
 
 public:
+	virtual int rowCount(const QModelIndex& parent) const;
+	virtual int columnCount(const QModelIndex& parent) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+	virtual QVariant data(const QModelIndex &index, int role) const;
+	virtual QModelIndex parent(const QModelIndex& index) const;
+	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
 
 private:
 	void _init();
 	void _createTree();
 	void _destroyTree();
 	void _createChildren();
+	KFileItemNode* _nodeFromIndex(const QModelIndex& index) const;
 
 private:
-	QString m_strRootPath;
+	QString m_rootPath;
 	QFileInfo m_rootFileInfo;
 	KFileItemNode* m_rootNode;
 
