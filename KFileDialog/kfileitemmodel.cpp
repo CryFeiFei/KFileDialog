@@ -3,6 +3,42 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QApplication>
+
+//#include <QtCu
+//#include <Qt
+
+static void addChildren(QString m_rootPath, QStringList filter, KFileItemNode* rootNode)
+{
+	QDir dir(m_rootPath);
+	QFileInfoList infoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+	for (int i = 0; i < infoList.size(); i++)
+	{
+		QFileInfo fileInfo = infoList.at(i);
+		QString childFileName = fileInfo.absoluteFilePath();
+
+		KFileItemNode::FileType fileType;
+		if (fileInfo.isFile())
+		{
+			fileType = KFileItemNode::File;
+		}
+		else if (fileInfo.isDir())
+		{
+			fileType = KFileItemNode::Folder;
+		}
+		else
+		{
+			continue ;
+		}
+
+		KFileItemNode* childNode = new KFileItemNode(fileType, rootNode, childFileName);
+		if (childNode)
+			rootNode->m_children.append(childNode);
+
+	}
+}
 
 KFileItemNode::KFileItemNode(FileType fileType, KFileItemNode *parent, const QString &fileName)
 	: m_fileType(fileType)
@@ -74,35 +110,16 @@ void KFileItemModel::_destroyTree()
 #endif
 }
 
+// 这里放到子线程里做
 void KFileItemModel::_createChildren()
 {
 	//todo 这里要写过滤条件
-	QStringList m_listType;
-	m_listType<<"*.*";
-	QDir dir(m_strRootPath);
-	QFileInfoList infoList = dir.entryInfoList(m_listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-	for (int i = 0; i < infoList.size(); i++)
+	QStringList listType;
+	listType<<"*.*";
+
+	QFuture<void> future = QtConcurrent::run(addChildren, m_strRootPath, listType, m_rootNode);
+	while(!future.isFinished())
 	{
-		QFileInfo fileInfo = infoList.at(i);
-		QString childFileName = fileInfo.absoluteFilePath();
-
-		KFileItemNode::FileType fileType;
-		if (fileInfo.isFile())
-		{
-			fileType = KFileItemNode::File;
-		}
-		else if (fileInfo.isDir())
-		{
-			fileType = KFileItemNode::Folder;
-		}
-		else
-		{
-			continue ;
-		}
-
-		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
-		if (childNode)
-			m_rootNode->m_children.append(childNode);
-
+		QApplication::processEvents(QEventLoop::AllEvents, 100);
 	}
 }
