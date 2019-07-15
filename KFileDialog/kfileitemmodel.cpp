@@ -11,35 +11,35 @@
 //#include <QtCu
 //#include <Qt
 
-static void addChildren(QString m_rootPath, QStringList filter, KFileItemNode* rootNode)
-{
-	QDir dir(m_rootPath);
-	QFileInfoList infoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-	for (int i = 0; i < infoList.size(); i++)
-	{
-		QFileInfo fileInfo = infoList.at(i);
-		QString childFileName = fileInfo.absoluteFilePath();
+//static void addChildren(QString m_rootPath, QStringList filter, KFileItemNode* rootNode)
+//{
+//	QDir dir(m_rootPath);
+//	QFileInfoList infoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+//	for (int i = 0; i < infoList.size(); i++)
+//	{
+//		QFileInfo fileInfo = infoList.at(i);
+//		QString childFileName = fileInfo.absoluteFilePath();
 
-		KFileItemNode::FileType fileType;
-		if (fileInfo.isFile())
-		{
-			fileType = KFileItemNode::File;
-		}
-		else if (fileInfo.isDir())
-		{
-			fileType = KFileItemNode::Folder;
-		}
-		else
-		{
-			continue ;
-		}
+//		KFileItemNode::FileType fileType;
+//		if (fileInfo.isFile())
+//		{
+//			fileType = KFileItemNode::File;
+//		}
+//		else if (fileInfo.isDir())
+//		{
+//			fileType = KFileItemNode::Folder;
+//		}
+//		else
+//		{
+//			continue ;
+//		}
 
-		KFileItemNode* childNode = new KFileItemNode(fileType, rootNode, childFileName);
-		if (childNode)
-			rootNode->m_children.append(childNode);
+//		KFileItemNode* childNode = new KFileItemNode(fileType, rootNode, childFileName);
+//		if (childNode)
+//			rootNode->m_children.append(childNode);
 
-	}
-}
+//	}
+//}
 
 KFileItemNode::KFileItemNode(FileType fileType, KFileItemNode *parent, const QString &fileName)
 	: m_fileType(fileType)
@@ -91,11 +91,11 @@ void KFileItemModel::_createTree()
 
 	if (rootInfo.isDir())
 	{
-//		m_rootNode = new KFileItemNode(KFileItemNode::Folder, nullptr, m_rootPath);
-//		if (m_rootNode)
-//		{
+		m_rootNode = new KFileItemNode(KFileItemNode::Folder, nullptr, m_rootPath);
+		if (m_rootNode)
+		{
 			_createChildren();
-//		}
+		}
 	}
 	resetInternalData();
 }
@@ -120,17 +120,34 @@ void KFileItemModel::_createChildren()
 	QStringList listType;
 	listType<<"*.*";
 
-	KFileItemNode* rootNode = new KFileItemNode(KFileItemNode::Folder, nullptr, m_rootPath);
-	QFuture<void> future = QtConcurrent::run(addChildren, m_rootPath, listType, rootNode);
-	while(!future.isFinished())
+
+	QDir dir(m_rootPath);
+	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+	m_fileCount = m_fileInfoList.size();
+
+	for (int i = 0; i < 10; i++)
 	{
-		QApplication::processEvents(QEventLoop::AllEvents, 100);
-	}
-	if (future.isFinished())
-	{
-		beginResetModel();
-		m_rootNode = std::move(rootNode);
-		endResetModel();
+		QFileInfo fileInfo = m_fileInfoList.at(i);
+		QString childFileName = fileInfo.absoluteFilePath();
+
+		KFileItemNode::FileType fileType;
+		if (fileInfo.isFile())
+		{
+			fileType = KFileItemNode::File;
+		}
+		else if (fileInfo.isDir())
+		{
+			fileType = KFileItemNode::Folder;
+		}
+		else
+		{
+			continue ;
+		}
+
+		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
+		if (childNode)
+			m_rootNode->m_children.append(childNode);
+
 	}
 }
 
@@ -252,4 +269,53 @@ QModelIndex KFileItemModel::index(int row, int column, const QModelIndex& parent
 		return createIndex(row, column, childNode);
 	}
 	return QModelIndex();
+}
+
+bool KFileItemModel::canFetchMore(const QModelIndex &parent) const
+{
+	if (parent.isValid())
+		return false;
+
+	return m_rootNode->m_children.size() < m_fileInfoList.size();
+}
+
+void KFileItemModel::fetchMore(const QModelIndex &parent)
+{
+	if (parent.isValid())
+		return;
+	int remainder = m_fileInfoList.size() - m_rootNode->m_children.size();
+	int itemsToFetch = qMin(1, remainder);
+
+	if (itemsToFetch <= 0)
+		return;
+
+	beginInsertRows(QModelIndex(), m_rootNode->m_children.size(), m_rootNode->m_children.size() + itemsToFetch - 1);
+
+//	fileCount += itemsToFetch;
+//	for (int i = m_rootNode->m_children.size(); i < m_rootNode->m_children.size() + itemsToFetch; i++)
+//	{
+//		QFileInfo fileInfo = m_fileInfoList.at(i);
+//		QString childFileName = fileInfo.absoluteFilePath();
+
+//		KFileItemNode::FileType fileType;
+//		if (fileInfo.isFile())
+//		{
+//			fileType = KFileItemNode::File;
+//		}
+//		else if (fileInfo.isDir())
+//		{
+//			fileType = KFileItemNode::Folder;
+//		}
+//		else
+//		{
+//			continue ;
+//		}
+
+//		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
+//		if (childNode)
+//			m_rootNode->m_children.append(childNode);
+
+//	}
+
+	endInsertRows();
 }

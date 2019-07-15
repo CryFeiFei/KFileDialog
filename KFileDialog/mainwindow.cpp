@@ -3,6 +3,7 @@
 #include "kfileitemmodel.h"
 #include <QStandardPaths>
 #include <QSortFilterProxyModel>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -10,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 	QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+	QString str = QDir::separator() + QString("123");
+	strDesktop += str;
 
 	KFileItemModel* model = new KFileItemModel(ui->treeView, strDesktop);
 

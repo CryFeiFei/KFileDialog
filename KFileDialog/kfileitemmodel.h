@@ -38,6 +38,9 @@ public:
 	virtual QModelIndex parent(const QModelIndex& index) const;
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
 
+	virtual bool canFetchMore(const QModelIndex &parent) const;
+	virtual void fetchMore(const QModelIndex &parent);
+
 private:
 	void _init();
 	void _createTree();
@@ -49,6 +52,10 @@ private:
 	QString m_rootPath;
 	QFileInfo m_rootFileInfo;
 	KFileItemNode* m_rootNode;
+
+	//
+	int m_fileCount;
+	QFileInfoList m_fileInfoList;
 
 };
 
