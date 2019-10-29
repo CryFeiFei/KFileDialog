@@ -2,12 +2,16 @@
 #define WORKTHREAD_H
 
 #include <QObject>
+#include <QDir>
+#include <QFileInfo>
+#include <QMetaType>
+
 
 class TimerThread : public QObject
 {
 	Q_OBJECT
 public:
-	TimerThread(QObject* parent = nullptr);
+	TimerThread(const QString& path, QObject* parent = nullptr);
 	~TimerThread();
 public:
 	void run();
@@ -15,7 +19,10 @@ public:
 signals:
 	void workStart();
 	void workFinished();
-	void working();
+	void working(QString& fileInfo);
+
+private:
+	QFileInfoList m_fileInfoList;
 };
 
 #endif // WORKTHREAD_H

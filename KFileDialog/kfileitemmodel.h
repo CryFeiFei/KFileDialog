@@ -44,7 +44,7 @@ public:
 
 public slots:
 	void addChildren();
-	void addTenItem();
+	void addTenItem(QString& fileInfo);
 
 private:
 	void _init();

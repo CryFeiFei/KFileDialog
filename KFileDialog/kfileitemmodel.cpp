@@ -9,6 +9,7 @@
 #include <QFileIconProvider>
 #include "workthread.h"
 #include <QThread>
+#include <QMetaType>
 
 //#include <QtCu
 //#include <Qt
@@ -62,9 +63,10 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 {
 	m_rootPath = QDir::toNativeSeparators(rootPath);
 
+	qRegisterMetaType<QString>("QString&");
 
 	QThread* workerThread = new QThread();
-	TimerThread* worker = new TimerThread();
+	TimerThread* worker = new TimerThread(m_rootPath);
 	worker->moveToThread(workerThread);
 
 //	connect(ui->threadButton2, &QPushButton::clicked, fTimerThreadStart);
@@ -80,9 +82,9 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 	connect(worker, &TimerThread::working, this, &KFileItemModel::addTenItem);
 }
 
-KFileItemModel::addTenItem()
+void KFileItemModel::addTenItem(QString& fileInfo)
 {
-
+	qDebug()<<fileInfo<<endl;
 }
 
 KFileItemModel::~KFileItemModel()
