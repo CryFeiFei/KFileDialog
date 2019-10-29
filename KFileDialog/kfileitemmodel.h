@@ -3,6 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QFileInfo>
+#include <QTimer>
 
 class KFileItemNode
 {
@@ -38,8 +39,12 @@ public:
 	virtual QModelIndex parent(const QModelIndex& index) const;
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
 
-	virtual bool canFetchMore(const QModelIndex &parent) const;
-	virtual void fetchMore(const QModelIndex &parent);
+//	virtual bool canFetchMore(const QModelIndex &parent) const;
+//	virtual void fetchMore(const QModelIndex &parent);
+
+public slots:
+	void addChildren();
+	void addTenItem();
 
 private:
 	void _init();
@@ -56,6 +61,10 @@ private:
 	//
 	int m_fileCount;
 	QFileInfoList m_fileInfoList;
+
+	//定时器
+	//定时添加
+	QTimer* m_timer;
 
 };
 

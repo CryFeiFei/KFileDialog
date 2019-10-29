@@ -7,6 +7,8 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QApplication>
 #include <QFileIconProvider>
+#include "workthread.h"
+#include <QThread>
 
 //#include <QtCu
 //#include <Qt
@@ -59,7 +61,28 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 	, m_rootNode(nullptr)
 {
 	m_rootPath = QDir::toNativeSeparators(rootPath);
+
+
+	QThread* workerThread = new QThread();
+	TimerThread* worker = new TimerThread();
+	worker->moveToThread(workerThread);
+
+//	connect(ui->threadButton2, &QPushButton::clicked, fTimerThreadStart);
+	QObject::connect(workerThread, &QThread::started, worker, &TimerThread::run);
+	QObject::connect(worker, &TimerThread::workFinished, workerThread, &QThread::quit);
+	QObject::connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
+
+	workerThread->start();
+//	m_timer->start(2000);
+
 	_createTree();
+
+	connect(worker, &TimerThread::working, this, &KFileItemModel::addTenItem);
+}
+
+KFileItemModel::addTenItem()
+{
+
 }
 
 KFileItemModel::~KFileItemModel()
@@ -271,51 +294,51 @@ QModelIndex KFileItemModel::index(int row, int column, const QModelIndex& parent
 	return QModelIndex();
 }
 
-bool KFileItemModel::canFetchMore(const QModelIndex &parent) const
-{
-	if (parent.isValid())
-		return false;
+//bool KFileItemModel::canFetchMore(const QModelIndex &parent) const
+//{
+//	if (parent.isValid())
+//		return false;
 
-	return m_rootNode->m_children.size() < m_fileInfoList.size();
-}
+//	return m_rootNode->m_children.size() < m_fileInfoList.size();
+//}
 
-void KFileItemModel::fetchMore(const QModelIndex &parent)
-{
-	if (parent.isValid())
-		return;
-	int remainder = m_fileInfoList.size() - m_rootNode->m_children.size();
-	int itemsToFetch = qMin(1, remainder);
+//void KFileItemModel::fetchMore(const QModelIndex &parent)
+//{
+//	if (parent.isValid())
+//		return;
+//	int remainder = m_fileInfoList.size() - m_rootNode->m_children.size();
+//	int itemsToFetch = qMin(1, remainder);
 
-	if (itemsToFetch <= 0)
-		return;
+//	if (itemsToFetch <= 0)
+//		return;
 
-	beginInsertRows(QModelIndex(), m_rootNode->m_children.size(), m_rootNode->m_children.size() + itemsToFetch - 1);
+//	beginInsertRows(parent, m_rootNode->m_children.size(), m_rootNode->m_children.size() + itemsToFetch - 1);
 
-//	fileCount += itemsToFetch;
-//	for (int i = m_rootNode->m_children.size(); i < m_rootNode->m_children.size() + itemsToFetch; i++)
-//	{
-//		QFileInfo fileInfo = m_fileInfoList.at(i);
-//		QString childFileName = fileInfo.absoluteFilePath();
+////	fileCount += itemsToFetch;
+////	for (int i = m_rootNode->m_children.size(); i < m_rootNode->m_children.size() + itemsToFetch; i++)
+////	{
+////		QFileInfo fileInfo = m_fileInfoList.at(i);
+////		QString childFileName = fileInfo.absoluteFilePath();
 
-//		KFileItemNode::FileType fileType;
-//		if (fileInfo.isFile())
-//		{
-//			fileType = KFileItemNode::File;
-//		}
-//		else if (fileInfo.isDir())
-//		{
-//			fileType = KFileItemNode::Folder;
-//		}
-//		else
-//		{
-//			continue ;
-//		}
+////		KFileItemNode::FileType fileType;
+////		if (fileInfo.isFile())
+////		{
+////			fileType = KFileItemNode::File;
+////		}
+////		else if (fileInfo.isDir())
+////		{
+////			fileType = KFileItemNode::Folder;
+////		}
+////		else
+////		{
+////			continue ;
+////		}
 
-//		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
-//		if (childNode)
-//			m_rootNode->m_children.append(childNode);
+////		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
+////		if (childNode)
+////			m_rootNode->m_children.append(childNode);
 
-//	}
+////	}
 
-	endInsertRows();
-}
+//	endInsertRows();
+//}
