@@ -16,15 +16,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	KFileItemModel* model = new KFileItemModel(ui->treeView, strDesktop);
 
-	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
-	pProxyModel->setSourceModel(model);
+//	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
+//	pProxyModel->setSourceModel(model);
 
 	ui->treeView->setRootIsDecorated(false);
 	ui->treeView->setItemsExpandable(false);
 	ui->treeView->header()->setSortIndicatorShown(false);
 //	ui->treeView->setItemDelegate(new UnixTempTreeDelegate(treeView));
 	ui->treeView->setSortingEnabled(true);
-	ui->treeView->setModel(pProxyModel);
+	ui->treeView->setModel(model);
 	ui->treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 

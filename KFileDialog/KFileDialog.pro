@@ -28,6 +28,7 @@ CONFIG += c++11
 SOURCES += \
         kfiledialog.cpp \
         kfileitemmodel.cpp \
+        kfileitemnode.cpp \
         main.cpp \
         mainwindow.cpp \
         workthread.cpp
@@ -35,6 +36,7 @@ SOURCES += \
 HEADERS += \
         kfiledialog.h \
         kfileitemmodel.h \
+        kfileitemnode.h \
         mainwindow.h \
         workthread.h
 

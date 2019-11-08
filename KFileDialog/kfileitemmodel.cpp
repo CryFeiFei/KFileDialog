@@ -44,18 +44,6 @@
 //	}
 //}
 
-KFileItemNode::KFileItemNode(FileType fileType, KFileItemNode *parent, const QString &fileName)
-	: m_fileType(fileType)
-	, m_parent(parent)
-	, m_fileName(fileName)
-{
-
-}
-
-KFileItemNode::~KFileItemNode()
-{
-	qDeleteAll(m_children);
-}
 
 KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& rootPath)
 	: QAbstractItemModel(parent)
@@ -63,28 +51,38 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 {
 	m_rootPath = QDir::toNativeSeparators(rootPath);
 
-	qRegisterMetaType<QString>("QString&");
+	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
+	QThread* thread = new QThread();
+	WorkThread* worker = new WorkThread(m_rootPath);
+	worker->moveToThread(thread);
 
-	QThread* workerThread = new QThread();
-	TimerThread* worker = new TimerThread(m_rootPath);
-	worker->moveToThread(workerThread);
+	QObject::connect(thread, &QThread::started, worker, &WorkThread::run);
+	QObject::connect(worker, &WorkThread::workFinished, worker, &WorkThread::deleteLater);
+	QObject::connect(worker, &WorkThread::destroyed, thread, &QThread::quit);
+//	QObject::connect(worker, &WorkThread::workFinished, thread, &QThread::quit);
+//	QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-//	connect(ui->threadButton2, &QPushButton::clicked, fTimerThreadStart);
-	QObject::connect(workerThread, &QThread::started, worker, &TimerThread::run);
-	QObject::connect(worker, &TimerThread::workFinished, workerThread, &QThread::quit);
-	QObject::connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
-
-	workerThread->start();
-//	m_timer->start(2000);
+	thread->start();
 
 	_createTree();
 
-	connect(worker, &TimerThread::working, this, &KFileItemModel::addTenItem);
+	connect(worker, &WorkThread::working, this, &KFileItemModel::addItems);
 }
 
-void KFileItemModel::addTenItem(QString& fileInfo)
+void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)
 {
-	qDebug()<<fileInfo<<endl;
+	beginInsertRows(QModelIndex(), m_rootNode->m_children.size(), m_rootNode->m_children.size() + fileInfo.size() - 1);
+
+//	while(1)
+//	{
+	for (int i = 0; i < fileInfo.size(); i++)
+	{
+		m_rootNode->m_children.append(fileInfo.at(i));
+	}
+
+
+	endInsertRows();
+//	qDebug()<<"fileInfo"<<endl;
 }
 
 KFileItemModel::~KFileItemModel()
@@ -116,11 +114,11 @@ void KFileItemModel::_createTree()
 
 	if (rootInfo.isDir())
 	{
-		m_rootNode = new KFileItemNode(KFileItemNode::Folder, nullptr, m_rootPath);
-		if (m_rootNode)
-		{
-			_createChildren();
-		}
+		m_rootNode = new KFileItemNode(KFileItemNode::Folder, m_rootPath, nullptr);
+//		if (m_rootNode)
+//		{
+//			_createChildren();
+//		}
 	}
 	resetInternalData();
 }
@@ -139,42 +137,42 @@ void KFileItemModel::_destroyTree()
 }
 
 // 这里放到子线程里做
-void KFileItemModel::_createChildren()
-{
-	//todo 这里要写过滤条件
-	QStringList listType;
-	listType<<"*.*";
+//void KFileItemModel::_createChildren()
+//{
+//	//todo 这里要写过滤条件
+//	QStringList listType;
+//	listType<<"*.*";
 
 
-	QDir dir(m_rootPath);
-	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-	m_fileCount = m_fileInfoList.size();
+//	QDir dir(m_rootPath);
+//	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+//	m_fileCount = m_fileInfoList.size();
 
-	for (int i = 0; i < 10; i++)
-	{
-		QFileInfo fileInfo = m_fileInfoList.at(i);
-		QString childFileName = fileInfo.absoluteFilePath();
+//	for (int i = 0; i < 10; i++)
+//	{
+//		QFileInfo fileInfo = m_fileInfoList.at(i);
+//		QString childFileName = fileInfo.absoluteFilePath();
 
-		KFileItemNode::FileType fileType;
-		if (fileInfo.isFile())
-		{
-			fileType = KFileItemNode::File;
-		}
-		else if (fileInfo.isDir())
-		{
-			fileType = KFileItemNode::Folder;
-		}
-		else
-		{
-			continue ;
-		}
+//		KFileItemNode::FileType fileType;
+//		if (fileInfo.isFile())
+//		{
+//			fileType = KFileItemNode::File;
+//		}
+//		else if (fileInfo.isDir())
+//		{
+//			fileType = KFileItemNode::Folder;
+//		}
+//		else
+//		{
+//			continue ;
+//		}
 
-		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
-		if (childNode)
-			m_rootNode->m_children.append(childNode);
+//		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
+//		if (childNode)
+//			m_rootNode->m_children.append(childNode);
 
-	}
-}
+//	}
+//}
 
 KFileItemNode* KFileItemModel::_nodeFromIndex(const QModelIndex &index) const
 {

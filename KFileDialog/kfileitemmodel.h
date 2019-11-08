@@ -4,24 +4,7 @@
 #include <QAbstractItemModel>
 #include <QFileInfo>
 #include <QTimer>
-
-class KFileItemNode
-{
-public:
-	enum FileType
-	{
-		File,
-		Folder,
-	};
-
-	explicit KFileItemNode(FileType fileType, KFileItemNode* parent = nullptr, const QString& fileName = QString());
-	~KFileItemNode();
-
-	QString m_fileName;
-	FileType m_fileType;
-	KFileItemNode* m_parent;
-	QList<KFileItemNode*> m_children;
-};
+#include "kfileitemnode.h"
 
 //只加载当前目录的所有的文件以及文件夹
 //由于性能问题，暂时还要把加载过程放到新的线程里。
@@ -44,13 +27,13 @@ public:
 
 public slots:
 	void addChildren();
-	void addTenItem(QString& fileInfo);
+	void addItems(QList<KFileItemNode*> fileInfo);
 
 private:
 	void _init();
 	void _createTree();
 	void _destroyTree();
-	void _createChildren();
+//	void _createChildren();
 	KFileItemNode* _nodeFromIndex(const QModelIndex& index) const;
 
 private:
