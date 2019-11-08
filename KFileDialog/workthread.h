@@ -7,6 +7,7 @@
 #include <QMetaType>
 #include <QVector>
 #include <QList>
+#include <QElapsedTimer>
 
 class KFileItemNode;
 
@@ -26,6 +27,7 @@ signals:
 	void working(QList<KFileItemNode*> fileInfo);
 
 private:
+	QElapsedTimer m_Timer;
 	QFileInfoList m_fileInfoList;
 
 	int m_emitIndex;

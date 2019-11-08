@@ -14,18 +14,20 @@ MainWindow::MainWindow(QWidget *parent) :
 	QString str = QDir::separator() + QString("123");
 	strDesktop += str;
 
-	KFileItemModel* model = new KFileItemModel(ui->treeView, strDesktop);
+	KFileItemModel* model = new KFileItemModel(ui->tableView, strDesktop);
 
 //	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
 //	pProxyModel->setSourceModel(model);
 
-	ui->treeView->setRootIsDecorated(false);
-	ui->treeView->setItemsExpandable(false);
-	ui->treeView->header()->setSortIndicatorShown(false);
+//	ui->listView->setRootIsDecorated(false);
+//	ui->listView->setItemsExpandable(false);
+//	ui->listView->header()->setSortIndicatorShown(false);
 //	ui->treeView->setItemDelegate(new UnixTempTreeDelegate(treeView));
-	ui->treeView->setSortingEnabled(true);
-	ui->treeView->setModel(model);
-	ui->treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+//	ui->listView->setSortingEnabled(true);
+	ui->tableView->setModel(model);
+//	ui->tableView->setSortingEnabled(true);
+
+	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 MainWindow::~MainWindow()

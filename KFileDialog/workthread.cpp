@@ -14,7 +14,7 @@ WorkThread::WorkThread(const QString& path, QObject* parent): QObject (parent), 
 
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
 	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-
+	m_Timer.start();
 }
 WorkThread::~WorkThread()
 {
@@ -41,7 +41,7 @@ void WorkThread::doWork()
 	static int emitCount = 0;
 	QList<KFileItemNode*> nodeList;
 	nodeList.clear();
-
+	m_Timer.start();
 	for (int i = 0; i < m_fileInfoList.size(); i++)
 	{
 		QFileInfo fileInfo = m_fileInfoList.at(i);
@@ -68,18 +68,19 @@ void WorkThread::doWork()
 			m_vecFileItem.append(*childNode);
 			nodeList.append(childNode);
 		}
-
-		if (emitCount > 1000 || m_vecFileItem.count() == m_fileInfoList.count())
+//		sleep(2);
+		if (emitCount > 10000 || m_Timer.elapsed() > 2000|| m_vecFileItem.count() == m_fileInfoList.count())
 		{
-			sleep(2);
+			qDebug()<<"!!!!!!!!!!!!!!!!!!!1"<<endl;
 			emit working(nodeList);
-
+			m_Timer.start();
 			nodeList.clear();
 			emitCount = 0;
 		}
 
 //		m_vecFileItem.push_back(KFileItemNode(m_fileInfoList));
 	}
+
 //	emit workFinished();
 //	timerCount ++;
 //	if (timerCount > 100)
