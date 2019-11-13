@@ -4,6 +4,7 @@
 #include <QStandardPaths>
 #include <QSortFilterProxyModel>
 #include <QDir>
+#include <QFileSystemModel>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -26,8 +27,13 @@ MainWindow::MainWindow(QWidget *parent) :
 //	ui->listView->setSortingEnabled(true);
 	ui->tableView->setModel(model);
 //	ui->tableView->setSortingEnabled(true);
-
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+
+	QFileSystemModel* sysModel = new QFileSystemModel(this);
+	QModelIndex index = sysModel->setRootPath(strDesktop);
+	ui->tableView_2->setModel(sysModel);
+	ui->tableView_2->setRootIndex(index);
 }
 
 MainWindow::~MainWindow()

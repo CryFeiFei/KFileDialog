@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include "kfileitemnode.h"
-#include <unistd.h>
+
 
 static int timerCount = 100000;
 WorkThread::WorkThread(const QString& path, QObject* parent): QObject (parent), m_emitIndex(0)
