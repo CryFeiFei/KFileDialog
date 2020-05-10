@@ -6,6 +6,10 @@
 #include <QDir>
 #include <QFileSystemModel>
 
+#if _DEBUG
+#include <QDebug>
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -28,15 +32,34 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->tableView->setModel(model);
 //	ui->tableView->setSortingEnabled(true);
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	ui->tableView->setShowGrid(false); //不显示格子线
+	ui->tableView->horizontalHeader()->setStretchLastSection(true);
+	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui->tableView->horizontalHeader()->setEnabled(false);
+
+	connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
+	//----------------------
 
 
 	QFileSystemModel* sysModel = new QFileSystemModel(this);
 	QModelIndex index = sysModel->setRootPath(strDesktop);
 	ui->tableView_2->setModel(sysModel);
 	ui->tableView_2->setRootIndex(index);
+	ui->tableView_2->setVisible(false);
 }
 
 MainWindow::~MainWindow()
 {
 	delete ui;
 }
+
+void MainWindow::sortHeader(int nHeaderIndex)
+{
+
+	//文件多的话，这里得重写
+
+}
+
+//-----------------------------------------------
+
+

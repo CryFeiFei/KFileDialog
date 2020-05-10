@@ -52,12 +52,18 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 	m_rootPath = QDir::toNativeSeparators(rootPath);
 
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
+
 	QThread* thread = new QThread();
 	WorkThread* worker = new WorkThread(m_rootPath);
 	worker->moveToThread(thread);
 
+	//开始的时候启动线程。
 	QObject::connect(thread, &QThread::started, worker, &WorkThread::run);
-	QObject::connect(worker, &WorkThread::workFinished, worker, &WorkThread::deleteLater);
+	//读取结束之后线程暂停。
+//	QObject::connect(worker, &WorkThread::workFinished, thread, &QThread::wait);
+
+
+	QObject::connect(worker, &WorkThread::workDestory, worker, &WorkThread::deleteLater);
 	QObject::connect(worker, &WorkThread::destroyed, thread, &QThread::quit);
 //	QObject::connect(worker, &WorkThread::workFinished, thread, &QThread::quit);
 //	QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -136,43 +142,6 @@ void KFileItemModel::_destroyTree()
 //#endif
 }
 
-// 这里放到子线程里做
-//void KFileItemModel::_createChildren()
-//{
-//	//todo 这里要写过滤条件
-//	QStringList listType;
-//	listType<<"*.*";
-
-
-//	QDir dir(m_rootPath);
-//	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-//	m_fileCount = m_fileInfoList.size();
-
-//	for (int i = 0; i < 10; i++)
-//	{
-//		QFileInfo fileInfo = m_fileInfoList.at(i);
-//		QString childFileName = fileInfo.absoluteFilePath();
-
-//		KFileItemNode::FileType fileType;
-//		if (fileInfo.isFile())
-//		{
-//			fileType = KFileItemNode::File;
-//		}
-//		else if (fileInfo.isDir())
-//		{
-//			fileType = KFileItemNode::Folder;
-//		}
-//		else
-//		{
-//			continue ;
-//		}
-
-//		KFileItemNode* childNode = new KFileItemNode(fileType, m_rootNode, childFileName);
-//		if (childNode)
-//			m_rootNode->m_children.append(childNode);
-
-//	}
-//}
 
 KFileItemNode* KFileItemModel::_nodeFromIndex(const QModelIndex &index) const
 {

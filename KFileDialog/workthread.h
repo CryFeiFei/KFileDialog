@@ -24,6 +24,7 @@ public:
 signals:
 	void workStart();
 	void workFinished();
+	void workDestory();
 	void working(QList<KFileItemNode*> fileInfo);
 
 private:

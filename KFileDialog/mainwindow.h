@@ -15,6 +15,9 @@ public:
 	explicit MainWindow(QWidget *parent = nullptr);
 	~MainWindow();
 
+public slots:
+	void sortHeader(int nHeaderIndex);
+
 private:
 	Ui::MainWindow *ui;
 };
