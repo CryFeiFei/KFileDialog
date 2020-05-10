@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QString str = QDir::separator() + QString("123");
 	strDesktop += str;
 
-	KFileItemModel* model = new KFileItemModel(ui->tableView, strDesktop);
+	KFileItemModel* kfileItemmodel = new KFileItemModel(ui->tableView, strDesktop);
 
 //	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
 //	pProxyModel->setSourceModel(model);
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //	ui->listView->header()->setSortIndicatorShown(false);
 //	ui->treeView->setItemDelegate(new UnixTempTreeDelegate(treeView));
 //	ui->listView->setSortingEnabled(true);
-	ui->tableView->setModel(model);
+	ui->tableView->setModel(kfileItemmodel);
 //	ui->tableView->setSortingEnabled(true);
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->tableView->setShowGrid(false); //不显示格子线
@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui->tableView->horizontalHeader()->setEnabled(false);
 
+	connect(kfileItemmodel, SIGNAL(loadFinished()), this, SLOT(modelLoadFinished()));
 	connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
 	//----------------------
 
@@ -57,7 +58,13 @@ void MainWindow::sortHeader(int nHeaderIndex)
 {
 
 	//文件多的话，这里得重写
+	qDebug()<<"click sort"<<endl;
 
+}
+
+void MainWindow::modelLoadFinished()
+{
+	ui->tableView->horizontalHeader()->setEnabled(true);
 }
 
 //-----------------------------------------------

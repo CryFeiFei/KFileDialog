@@ -37,8 +37,9 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 	m_loadThread->start();
 
 	_createTree();
-
 	connect(m_kloadThread, &KloadThread::working, this, &KFileItemModel::addItems);
+	connect(m_kloadThread, &KloadThread::workFinished, this, &KFileItemModel::loadFinished);
+//	connect(m_kloadThread, &KloadThread::workFinished, this, &KFileItemModel::loadFinished);
 }
 
 void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)

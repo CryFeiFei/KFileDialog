@@ -7,7 +7,11 @@
 
 
 static int timerCount = 100000;
-KloadThread::KloadThread(const QString& path, QObject* parent): QObject (parent), m_emitIndex(0)
+KloadThread::KloadThread(const QString& path, QObject* parent):
+	QObject (parent)
+	, m_emitIndex(0)
+	, m_stopLoad(false)
+	, m_loadCount(0)
 {
 	QDir dir(path);
 	QStringList listType;
@@ -29,6 +33,7 @@ void KloadThread::run()
 //	connect(timer, &QTimer::timeout, this, &KloadThread::timeEmit);
 //	timer->start(2000);
 	doWork();
+	qDebug()<<"emit workFinished"<<endl;
 	emit workFinished();
 }
 
@@ -37,14 +42,21 @@ void KloadThread::timeEmit()
 	qDebug()<<QTime::currentTime()<<endl;
 }
 
+void KloadThread::stopLoad()
+{
+	m_stopLoad = true;
+}
+
 void KloadThread::doWork()
 {
-	static int emitCount = 0;
 	QList<KFileItemNode*> nodeList;
 	nodeList.clear();
 	m_Timer.start();
 	for (int i = 0; i < m_fileInfoList.size(); i++)
 	{
+		if (m_stopLoad)
+			goto KS_EXIT;
+
 		QFileInfo fileInfo = m_fileInfoList.at(i);
 		QString childFileName = fileInfo.absoluteFilePath();
 
@@ -65,18 +77,18 @@ void KloadThread::doWork()
 		KFileItemNode* childNode = new KFileItemNode(fileType, childFileName);
 		if (childNode)
 		{
-			emitCount ++;
+			m_loadCount ++;
 			m_vecFileItem.append(*childNode);
 			nodeList.append(childNode);
 		}
 //		sleep(2);
-		if (emitCount > 10000 || m_Timer.elapsed() > 2000|| m_vecFileItem.count() == m_fileInfoList.count())
+		if (m_loadCount > 10000 || m_Timer.elapsed() > 2000|| m_vecFileItem.count() == m_fileInfoList.count())
 		{
 			qDebug()<<"!!!!!!!!!!!!!!!!!!!1"<<endl;
 			emit working(nodeList);
 			m_Timer.start();
 			nodeList.clear();
-			emitCount = 0;
+			m_loadCount = 0;
 		}
 
 //		m_vecFileItem.push_back(KFileItemNode(m_fileInfoList));
@@ -91,4 +103,8 @@ void KloadThread::doWork()
 //	QString strFileName = fileInfo.absoluteFilePath();
 //	emit working(strFileName);
 //	timerCount ++;
+
+KS_EXIT:
+	m_stopLoad = false;
+	return;
 }

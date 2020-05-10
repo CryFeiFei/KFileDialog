@@ -27,12 +27,18 @@ signals:
 	void workDestory();
 	void working(QList<KFileItemNode*> fileInfo);
 
+public slots:
+	void stopLoad();
+
 private:
 	QElapsedTimer m_Timer;
 	QFileInfoList m_fileInfoList;
 
 	int m_emitIndex;
 	QList<KFileItemNode> m_vecFileItem;
+
+	bool m_stopLoad;
+	int m_loadCount;
 };
 
 #endif // KloadThread_H

@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QTimer>
 #include "kfileitemnode.h"
+#include <QObject>
 
 class KloadThread;
 
@@ -14,6 +15,7 @@ class KFileItemModel : public QAbstractItemModel
 {
 public:
 	explicit KFileItemModel(QObject* parent = nullptr, const QString& rootPath = QString());
+	explicit KFileItemModel(QObject *parent = nullptr);
 	~KFileItemModel();
 
 public:
@@ -26,6 +28,9 @@ public:
 
 //	virtual bool canFetchMore(const QModelIndex &parent) const;
 //	virtual void fetchMore(const QModelIndex &parent);
+
+signals:
+	void loadFinished();
 
 public slots:
 	void addChildren();

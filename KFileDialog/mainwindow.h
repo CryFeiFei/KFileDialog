@@ -17,6 +17,7 @@ public:
 
 public slots:
 	void sortHeader(int nHeaderIndex);
+	void modelLoadFinished();
 
 private:
 	Ui::MainWindow *ui;
