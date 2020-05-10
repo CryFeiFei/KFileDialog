@@ -11,39 +11,6 @@
 #include <QThread>
 #include <QMetaType>
 
-//#include <QtCu
-//#include <Qt
-
-//static void addChildren(QString m_rootPath, QStringList filter, KFileItemNode* rootNode)
-//{
-//	QDir dir(m_rootPath);
-//	QFileInfoList infoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-//	for (int i = 0; i < infoList.size(); i++)
-//	{
-//		QFileInfo fileInfo = infoList.at(i);
-//		QString childFileName = fileInfo.absoluteFilePath();
-
-//		KFileItemNode::FileType fileType;
-//		if (fileInfo.isFile())
-//		{
-//			fileType = KFileItemNode::File;
-//		}
-//		else if (fileInfo.isDir())
-//		{
-//			fileType = KFileItemNode::Folder;
-//		}
-//		else
-//		{
-//			continue ;
-//		}
-
-//		KFileItemNode* childNode = new KFileItemNode(fileType, rootNode, childFileName);
-//		if (childNode)
-//			rootNode->m_children.append(childNode);
-
-//	}
-//}
-
 
 KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& rootPath)
 	: QAbstractItemModel(parent)
@@ -53,30 +20,25 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
 
-	QThread* thread = new QThread();
-	KloadThread* loadThread = new KloadThread(m_rootPath);
-	loadThread->moveToThread(thread);
+	m_loadThread = new QThread();
+	m_kloadThread = new KloadThread(m_rootPath);
+	m_kloadThread->moveToThread(m_loadThread);
 
 	//开始的时候启动线程。
-	QObject::connect(thread, &QThread::started, loadThread, &KloadThread::run);
+	QObject::connect(m_loadThread, &QThread::started, m_kloadThread, &KloadThread::run);
 	//读取结束之后线程暂停。
-	auto f = [this, &thread]()->void
-	{
-		thread->wait();
-	};
-	QObject::connect(loadThread, &KloadThread::workFinished, thread, f);
 
 
-	QObject::connect(loadThread, &KloadThread::workDestory, loadThread, &KloadThread::deleteLater);
-	QObject::connect(loadThread, &KloadThread::destroyed, thread, &QThread::quit);
-//	QObject::connect(loadThread, &KloadThread::workFinished, thread, &QThread::quit);
-//	QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+	QObject::connect(m_kloadThread, &KloadThread::workDestory, m_kloadThread, &KloadThread::deleteLater);
+	QObject::connect(m_kloadThread, &KloadThread::destroyed, m_loadThread, &QThread::quit);
+//	QObject::connect(m_kloadThread, &KloadThread::workFinished, m_loadThread, &QThread::quit);
+//	QObject::connect(m_kloadThread, &QThread::finished, m_loadThread, &QThread::deleteLater);
 
-	thread->start();
+	m_loadThread->start();
 
 	_createTree();
 
-	connect(loadThread, &KloadThread::working, this, &KFileItemModel::addItems);
+	connect(m_kloadThread, &KloadThread::working, this, &KFileItemModel::addItems);
 }
 
 void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)

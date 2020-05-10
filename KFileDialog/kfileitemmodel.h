@@ -6,6 +6,8 @@
 #include <QTimer>
 #include "kfileitemnode.h"
 
+class KloadThread;
+
 //只加载当前目录的所有的文件以及文件夹
 //由于性能问题，暂时还要把加载过程放到新的线程里。
 class KFileItemModel : public QAbstractItemModel
@@ -49,6 +51,12 @@ private:
 	//定时添加
 	QTimer* m_timer;
 
+	// load Thread
+	QThread* m_loadThread;
+	KloadThread* m_kloadThread;
+
+	// sort Thread
+	QThread* m_sortThread;
 };
 
 #endif // KFILEITEMMODEL_H
