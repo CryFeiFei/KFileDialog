@@ -7,7 +7,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QApplication>
 #include <QFileIconProvider>
-#include "workthread.h"
+#include "thread/KloadThread.h"
 #include <QThread>
 #include <QMetaType>
 
@@ -54,25 +54,29 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& roo
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
 
 	QThread* thread = new QThread();
-	WorkThread* worker = new WorkThread(m_rootPath);
-	worker->moveToThread(thread);
+	KloadThread* loadThread = new KloadThread(m_rootPath);
+	loadThread->moveToThread(thread);
 
 	//开始的时候启动线程。
-	QObject::connect(thread, &QThread::started, worker, &WorkThread::run);
+	QObject::connect(thread, &QThread::started, loadThread, &KloadThread::run);
 	//读取结束之后线程暂停。
-//	QObject::connect(worker, &WorkThread::workFinished, thread, &QThread::wait);
+	auto f = [this, &thread]()->void
+	{
+		thread->wait();
+	};
+	QObject::connect(loadThread, &KloadThread::workFinished, thread, f);
 
 
-	QObject::connect(worker, &WorkThread::workDestory, worker, &WorkThread::deleteLater);
-	QObject::connect(worker, &WorkThread::destroyed, thread, &QThread::quit);
-//	QObject::connect(worker, &WorkThread::workFinished, thread, &QThread::quit);
+	QObject::connect(loadThread, &KloadThread::workDestory, loadThread, &KloadThread::deleteLater);
+	QObject::connect(loadThread, &KloadThread::destroyed, thread, &QThread::quit);
+//	QObject::connect(loadThread, &KloadThread::workFinished, thread, &QThread::quit);
 //	QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
 	thread->start();
 
 	_createTree();
 
-	connect(worker, &WorkThread::working, this, &KFileItemModel::addItems);
+	connect(loadThread, &KloadThread::working, this, &KFileItemModel::addItems);
 }
 
 void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)

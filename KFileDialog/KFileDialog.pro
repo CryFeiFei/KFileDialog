@@ -31,14 +31,14 @@ SOURCES += \
         kfileitemnode.cpp \
         main.cpp \
         mainwindow.cpp \
-	workthread.cpp
+        thread/kloadthread.cpp
 
 HEADERS += \
         kfiledialog.h \
         kfileitemmodel.h \
         kfileitemnode.h \
         mainwindow.h \
-	workthread.h
+        thread/kloadthread.h
 
 FORMS += \
         kfiledialog.ui \
