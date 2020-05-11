@@ -6,9 +6,7 @@
 #include <QDir>
 #include <QFileSystemModel>
 
-#if _DEBUG
 #include <QDebug>
-#endif
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -19,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QString str = QDir::separator() + QString("123");
 	strDesktop += str;
 
-	KFileItemModel* kfileItemmodel = new KFileItemModel(ui->tableView, strDesktop);
+	KFileItemModel* kfileItemmodel = new KFileItemModel(strDesktop, ui->tableView);
 
 //	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
 //	pProxyModel->setSourceModel(model);

@@ -1,7 +1,7 @@
-#include "kloadThread.h"
 #include <QTimer>
 #include <QDebug>
 #include <QTime>
+#include "kloadthread.h"
 
 #include "../kfileitemnode.h"
 

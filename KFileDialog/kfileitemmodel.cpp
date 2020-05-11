@@ -7,12 +7,11 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QApplication>
 #include <QFileIconProvider>
-#include "thread/KloadThread.h"
+#include "thread/kloadthread.h"
 #include <QThread>
 #include <QMetaType>
 
-
-KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/, const QString& rootPath)
+KFileItemModel::KFileItemModel(const QString& rootPath, QObject* parent/* = nullptr*/)
 	: QAbstractItemModel(parent)
 	, m_rootNode(nullptr)
 {
@@ -56,11 +55,6 @@ void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)
 
 	endInsertRows();
 //	qDebug()<<"fileInfo"<<endl;
-}
-
-KFileItemModel::~KFileItemModel()
-{
-
 }
 
 void KFileItemModel::_init()
@@ -228,6 +222,18 @@ QModelIndex KFileItemModel::index(int row, int column, const QModelIndex& parent
 		return createIndex(row, column, childNode);
 	}
 	return QModelIndex();
+}
+
+
+Qt::ItemFlags KFileItemModel::flags(const QModelIndex& index) const
+{
+	if (!index.isValid())
+		return Qt::ItemIsEnabled;
+
+	if (index.column() == 1)
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 //bool KFileItemModel::canFetchMore(const QModelIndex &parent) const
