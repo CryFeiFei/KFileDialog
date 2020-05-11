@@ -32,18 +32,18 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->tableView->setShowGrid(false); //不显示格子线
 	ui->tableView->horizontalHeader()->setStretchLastSection(true);
-	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui->tableView->horizontalHeader()->setEnabled(false);
+	ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
 
 	connect(kfileItemmodel, SIGNAL(loadFinished()), this, SLOT(modelLoadFinished()));
 	connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
 	//----------------------
 
 
-	QFileSystemModel* sysModel = new QFileSystemModel(this);
-	QModelIndex index = sysModel->setRootPath(strDesktop);
-	ui->tableView_2->setModel(sysModel);
-	ui->tableView_2->setRootIndex(index);
+//	QFileSystemModel* sysModel = new QFileSystemModel(this);
+//	QModelIndex index = sysModel->setRootPath(strDesktop);
+//	ui->tableView_2->setModel(sysModel);
+//	ui->tableView_2->setRootIndex(index);
 	ui->tableView_2->setVisible(false);
 }
 
