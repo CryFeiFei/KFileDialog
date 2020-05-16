@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QFileSystemModel>
 
+#include "modelview/kdetailview.h"
+
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -28,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
 //	ui->treeView->setItemDelegate(new UnixTempTreeDelegate(treeView));
 //	ui->listView->setSortingEnabled(true);
 	ui->tableView->setModel(kfileItemmodel);
+
+	KFileItemDelegate* fileItemDelegate = new KFileItemDelegate(this);
+	ui->tableView->setItemDelegate(fileItemDelegate);
 //	ui->tableView->setSortingEnabled(true);
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->tableView->setShowGrid(false); //不显示格子线

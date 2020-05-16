@@ -31,6 +31,7 @@ SOURCES += \
         kfileitemnode.cpp \
         main.cpp \
         mainwindow.cpp \
+        modelview/kdetailview.cpp \
         thread/kloadthread.cpp
 
 HEADERS += \
@@ -38,6 +39,7 @@ HEADERS += \
         kfileitemmodel.h \
         kfileitemnode.h \
         mainwindow.h \
+        modelview/kdetailview.h \
         thread/kloadthread.h
 
 FORMS += \

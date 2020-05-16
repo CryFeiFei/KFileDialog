@@ -10,6 +10,7 @@
 #include "thread/kloadthread.h"
 #include <QThread>
 #include <QMetaType>
+#include <QLineEdit>
 
 KFileItemModel::KFileItemModel(const QString& rootPath, QObject* parent/* = nullptr*/)
 	: QAbstractItemModel(parent)
@@ -163,7 +164,7 @@ QVariant KFileItemModel::data(const QModelIndex &index, int role) const
 	//第一列文字
 	if (role == Qt::DisplayRole && index.column() == 0)
 	{
-		return QVariant(fileInfo.baseName());
+		return QVariant(fileInfo.fileName());
 	}
 
 	//第一列图标
@@ -230,11 +231,23 @@ Qt::ItemFlags KFileItemModel::flags(const QModelIndex& index) const
 	if (!index.isValid())
 		return Qt::ItemIsEnabled;
 
-	if (index.column() == 1)
+	if (index.column() == 0)
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
+
+//bool KFileItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+//{
+//	if (index.isValid() && role == Qt::EditRole)
+//	{
+//		KFileItemNode* node = static_cast<KFileItemNode*>(index.internalPointer());
+//		node->m_fileName = value.toString();
+//		emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+//		return true;
+//	}
+//	return false;
+//}
 
 //bool KFileItemModel::canFetchMore(const QModelIndex &parent) const
 //{
@@ -284,3 +297,5 @@ Qt::ItemFlags KFileItemModel::flags(const QModelIndex& index) const
 
 //	endInsertRows();
 //}
+
+// ------------------------------------------------------------------------------------------------

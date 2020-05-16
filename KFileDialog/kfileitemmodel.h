@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "kfileitemnode.h"
 #include <QObject>
+#include <QStyledItemDelegate>
 
 class KloadThread;
 
@@ -25,7 +26,11 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const;
 	virtual QModelIndex parent(const QModelIndex& index) const;
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
+
+
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+	//这个函数不写了，
+//	virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
 
 //	virtual bool canFetchMore(const QModelIndex &parent) const;
 //	virtual void fetchMore(const QModelIndex &parent);
