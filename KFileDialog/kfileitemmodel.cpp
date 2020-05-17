@@ -7,39 +7,73 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QApplication>
 #include <QFileIconProvider>
-#include "thread/kloadthread.h"
+#include "thread/klocalloadthread.h"
 #include <QThread>
 #include <QMetaType>
 #include <QLineEdit>
 
-KFileItemModel::KFileItemModel(const QString& rootPath, QObject* parent/* = nullptr*/)
+KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/)
 	: QAbstractItemModel(parent)
 	, m_rootNode(nullptr)
 {
-	m_rootPath = QDir::toNativeSeparators(rootPath);
-
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
 
 	m_loadThread = new QThread();
-	m_kloadThread = new KloadThread(m_rootPath);
-	m_kloadThread->moveToThread(m_loadThread);
+	m_kLocalLoadThread = new KLocalLoadThread();
+	m_kLocalLoadThread->moveToThread(m_loadThread);
 
 	//开始的时候启动线程。
-	QObject::connect(m_loadThread, &QThread::started, m_kloadThread, &KloadThread::run);
+	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
 	//读取结束之后线程暂停。
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
+}
+
+void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
+{
+	if (m_loadThread)
+	{
+		QObject::disconnect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
+	}
+
+	if (m_kLocalLoadThread)
+	{
+		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
+	}
+
+	m_rootPath = QDir::toNativeSeparators(path);
+//	QStringList filterListType;
+//	filterListType<<"*.*";
+	if (m_kLocalLoadThread)
+	{
+		m_kLocalLoadThread->stopLoad();
+		m_kLocalLoadThread->Init(path, listFilter);
+	}
+
+	//开始的时候启动线程。
+	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
+	//读取结束之后线程暂停。
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 
 
-	QObject::connect(m_kloadThread, &KloadThread::workDestory, m_kloadThread, &KloadThread::deleteLater);
-	QObject::connect(m_kloadThread, &KloadThread::destroyed, m_loadThread, &QThread::quit);
-//	QObject::connect(m_kloadThread, &KloadThread::workFinished, m_loadThread, &QThread::quit);
-//	QObject::connect(m_kloadThread, &QThread::finished, m_loadThread, &QThread::deleteLater);
-
-	m_loadThread->start();
-
+	_destroyTree();
 	_createTree();
-	connect(m_kloadThread, &KloadThread::working, this, &KFileItemModel::addItems);
-	connect(m_kloadThread, &KloadThread::workFinished, this, &KFileItemModel::loadFinished);
-//	connect(m_kloadThread, &KloadThread::workFinished, this, &KFileItemModel::loadFinished);
+
+	m_kLocalLoadThread->stopLoad(false);
+	if (m_loadThread->isRunning() && m_kLocalLoadThread)
+	{
+		m_kLocalLoadThread->run();
+	}
+	else
+		m_loadThread->start();
 }
 
 void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)
@@ -56,11 +90,6 @@ void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)
 
 	endInsertRows();
 //	qDebug()<<"fileInfo"<<endl;
-}
-
-void KFileItemModel::_init()
-{
-
 }
 
 void KFileItemModel::_createTree()
@@ -83,12 +112,7 @@ void KFileItemModel::_createTree()
 	if (rootInfo.isDir())
 	{
 		m_rootNode = new KFileItemNode(KFileItemNode::Folder, m_rootPath, nullptr);
-//		if (m_rootNode)
-//		{
-//			_createChildren();
-//		}
 	}
-	resetInternalData();
 }
 
 void KFileItemModel::_destroyTree()
@@ -96,12 +120,14 @@ void KFileItemModel::_destroyTree()
 	if (m_rootNode)
 	{
 		m_rootNode->m_children.clear();
+		m_rootNode->m_children.reserve(0);
 		delete m_rootNode;
 		m_rootNode = nullptr;
 	}
-//#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-	resetInternalData();
-//#endif
+//	resetInternalData();
+
+	// 要刷新下，要不然model里的scrollarea一直得刷新，具体表现就是数据没变，滚轴增加了
+	emit layoutChanged();
 }
 
 

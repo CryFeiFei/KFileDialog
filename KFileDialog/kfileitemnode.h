@@ -8,11 +8,11 @@ class KFileItemNode
 public:
 	enum FileType
 	{
-		File,
+		File = 0,
 		Folder,
 	};
 
-	KFileItemNode(FileType fileType, const QString& fileName = QString(), KFileItemNode* parent = nullptr);
+	KFileItemNode(FileType fileType = Folder, const QString& fileName = QString(), KFileItemNode* parent = nullptr);
 	~KFileItemNode();
 
 	QString m_fileName;

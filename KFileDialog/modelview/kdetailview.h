@@ -5,6 +5,7 @@
 #include <QTableView>
 #include <QStyledItemDelegate>
 
+class KFileItemModel;
 
 class KFileItemDelegate : public QStyledItemDelegate
 {
@@ -22,9 +23,20 @@ public:
 
 class KDetailView : public QTableView
 {
+	Q_OBJECT
 public:
 	KDetailView(QWidget *parent = nullptr);
 	~KDetailView(){}
+
+public:
+	void Init(const QString& loadPath, const QStringList& listFilter);
+
+public slots:
+	void modelLoadFinished();
+
+
+private:
+	KFileItemModel* m_model;
 };
 
 #endif // DETAILVIEW_H

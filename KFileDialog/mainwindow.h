@@ -16,8 +16,7 @@ public:
 	~MainWindow();
 
 public slots:
-	void sortHeader(int nHeaderIndex);
-	void modelLoadFinished();
+	void showFileDialog();
 
 private:
 	Ui::MainWindow *ui;

@@ -103,13 +103,43 @@
                <property name="styleSheet">
                 <string notr="true">background-color: rgb(255, 255, 0);</string>
                </property>
+               <widget class="QPushButton" name="pushButton">
+                <property name="geometry">
+                 <rect>
+                  <x>120</x>
+                  <y>20</y>
+                  <width>121</width>
+                  <height>21</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>PushButton</string>
+                </property>
+               </widget>
               </widget>
              </item>
              <item>
               <widget class="QWidget" name="mainWidget" native="true">
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 0, 127);</string>
+                <string notr="true"/>
                </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <layout class="QVBoxLayout" name="mainWidgetLayout">
+                  <item>
+                   <widget class="KStackWidget" name="stackedWidget">
+                    <property name="palette">
+                     <palette>
+                      <active/>
+                      <inactive/>
+                      <disabled/>
+                     </palette>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
@@ -143,6 +173,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KStackWidget</class>
+   <extends>QStackedWidget</extends>
+   <header>kstackwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

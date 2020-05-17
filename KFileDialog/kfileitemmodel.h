@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QStyledItemDelegate>
 
-class KloadThread;
+class KLocalLoadThread;
 
 //只加载当前目录的所有的文件以及文件夹
 //由于性能问题，暂时还要把加载过程放到新的线程里。
@@ -16,8 +16,11 @@ class KFileItemModel : public QAbstractItemModel
 {
 	Q_OBJECT
 public:
-	KFileItemModel(const QString& rootPath, QObject* parent = nullptr);
+	KFileItemModel(QObject* parent = nullptr);
 	~KFileItemModel(){}
+
+public:
+	void Init(const QString& path, const QStringList& listFilter);
 
 public:
 	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -42,7 +45,6 @@ public slots:
 	void addItems(QList<KFileItemNode*> fileInfo);
 
 private:
-	void _init();
 	void _createTree();
 	void _destroyTree();
 //	void _createChildren();
@@ -50,12 +52,7 @@ private:
 
 private:
 	QString m_rootPath;
-	QFileInfo m_rootFileInfo;
 	KFileItemNode* m_rootNode;
-
-	//
-	int m_fileCount;
-	QFileInfoList m_fileInfoList;
 
 	//定时器
 	//定时添加
@@ -63,7 +60,7 @@ private:
 
 	// load Thread
 	QThread* m_loadThread;
-	KloadThread* m_kloadThread;
+	KLocalLoadThread* m_kLocalLoadThread;
 
 	// sort Thread
 	QThread* m_sortThread;

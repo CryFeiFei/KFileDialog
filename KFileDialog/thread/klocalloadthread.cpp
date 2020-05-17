@@ -1,53 +1,60 @@
 #include <QTimer>
 #include <QDebug>
 #include <QTime>
-#include "kloadthread.h"
+#include "klocalloadthread.h"
 
 #include "../kfileitemnode.h"
 
-
-static int timerCount = 100000;
-KloadThread::KloadThread(const QString& path, QObject* parent):
+KLocalLoadThread::KLocalLoadThread(QObject* parent):
 	QObject (parent)
-	, m_emitIndex(0)
 	, m_stopLoad(false)
 	, m_loadCount(0)
 {
-	QDir dir(path);
-	QStringList listType;
-	listType<<"*.*";
-
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
-	m_fileInfoList = dir.entryInfoList(listType, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
-	m_Timer.start();
 }
-KloadThread::~KloadThread()
+KLocalLoadThread::~KLocalLoadThread()
 {
-	qDebug()<<"KloadThread Destory"<<endl;
+	qDebug()<<"KLocalLoadThread Destory"<<endl;
 }
-void KloadThread::run()
+
+void KLocalLoadThread::Init(const QString &path, const QStringList &filter)
+{
+	m_fileInfoList.clear();
+	m_loadCount = 0;
+	m_vecFileItem.clear();
+
+	m_rootPath = path;
+	m_listFilter = filter;
+
+	QDir dir(path);
+//	QStringList filterListType;
+//	filterListType<<"*.*";
+	m_fileInfoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+}
+
+void KLocalLoadThread::run()
 {
 	emit workStart();
 
 //	QTimer *timer = new QTimer(this);
-//	connect(timer, &QTimer::timeout, this, &KloadThread::timeEmit);
+//	connect(timer, &QTimer::timeout, this, &KLocalLoadThread::timeEmit);
 //	timer->start(2000);
 	doWork();
 	qDebug()<<"emit workFinished"<<endl;
 	emit workFinished();
 }
 
-void KloadThread::timeEmit()
+void KLocalLoadThread::timeEmit()
 {
 	qDebug()<<QTime::currentTime()<<endl;
 }
 
-void KloadThread::stopLoad()
+void KLocalLoadThread::stopLoad(bool stop/* = true*/)
 {
-	m_stopLoad = true;
+	m_stopLoad = stop;
 }
 
-void KloadThread::doWork()
+void KLocalLoadThread::doWork()
 {
 	QList<KFileItemNode*> nodeList;
 	nodeList.clear();
@@ -94,17 +101,8 @@ void KloadThread::doWork()
 //		m_vecFileItem.push_back(KFileItemNode(m_fileInfoList));
 	}
 
-//	emit workFinished();
-//	timerCount ++;
-//	if (timerCount > 100)
-//		emit workFinished();
-////	qDebug()<<QTime::currentTime()<<endl;
-//	QFileInfo fileInfo = m_fileInfoList.at(timerCount);
-//	QString strFileName = fileInfo.absoluteFilePath();
-//	emit working(strFileName);
-//	timerCount ++;
-
 KS_EXIT:
 	m_stopLoad = false;
+	m_loadCount = 0;
 	return;
 }

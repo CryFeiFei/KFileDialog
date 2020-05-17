@@ -29,18 +29,20 @@ SOURCES += \
         kfiledialog.cpp \
         kfileitemmodel.cpp \
         kfileitemnode.cpp \
+        kstackwidget.cpp \
         main.cpp \
         mainwindow.cpp \
         modelview/kdetailview.cpp \
-        thread/kloadthread.cpp
+        thread/klocalloadthread.cpp
 
 HEADERS += \
         kfiledialog.h \
         kfileitemmodel.h \
         kfileitemnode.h \
+        kstackwidget.h \
         mainwindow.h \
         modelview/kdetailview.h \
-        thread/kloadthread.h
+        thread/klocalloadthread.h
 
 FORMS += \
         kfiledialog.ui \

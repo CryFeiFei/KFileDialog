@@ -15,6 +15,9 @@ public:
 	explicit KFileDialog(QWidget *parent = nullptr);
 	~KFileDialog();
 
+public slots:
+	void chooseDir();
+
 private:
 	Ui::KFileDialog *ui;
 };
