@@ -31,7 +31,7 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/)
 	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 }
 
-void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
+void KFileItemModel::clearCache()
 {
 	if (m_loadThread)
 	{
@@ -40,20 +40,22 @@ void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
 
 	if (m_kLocalLoadThread)
 	{
+		m_kLocalLoadThread->stopLoad();
 		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
 		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
 		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
 		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 	}
 
+	destroyTree();
+}
+
+void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
+{
+	clearCache();
+
 	m_rootPath = QDir::toNativeSeparators(path);
-//	QStringList filterListType;
-//	filterListType<<"*.*";
-	if (m_kLocalLoadThread)
-	{
-		m_kLocalLoadThread->stopLoad();
-		m_kLocalLoadThread->Init(path, listFilter);
-	}
+	createTree();
 
 	//开始的时候启动线程。
 	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
@@ -63,11 +65,8 @@ void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
 	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
 	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 
+	m_kLocalLoadThread->Init(path, listFilter);
 
-	_destroyTree();
-	_createTree();
-
-	m_kLocalLoadThread->stopLoad(false);
 	if (m_loadThread->isRunning() && m_kLocalLoadThread)
 	{
 		m_kLocalLoadThread->run();
@@ -92,7 +91,7 @@ void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)
 //	qDebug()<<"fileInfo"<<endl;
 }
 
-void KFileItemModel::_createTree()
+void KFileItemModel::createTree()
 {
 	QFileInfo rootInfo(m_rootPath);
 	if (!rootInfo.exists())
@@ -107,15 +106,13 @@ void KFileItemModel::_createTree()
 		return;
 	}
 
-	_destroyTree();
-
 	if (rootInfo.isDir())
 	{
 		m_rootNode = new KFileItemNode(KFileItemNode::Folder, m_rootPath, nullptr);
 	}
 }
 
-void KFileItemModel::_destroyTree()
+void KFileItemModel::destroyTree()
 {
 	if (m_rootNode)
 	{
@@ -131,7 +128,7 @@ void KFileItemModel::_destroyTree()
 }
 
 
-KFileItemNode* KFileItemModel::_nodeFromIndex(const QModelIndex &index) const
+KFileItemNode* KFileItemModel::nodeFromIndex(const QModelIndex &index) const
 {
 	if (!index.isValid())
 		return m_rootNode;
@@ -184,7 +181,8 @@ QVariant KFileItemModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid() || index.model() != this)
 		return QVariant();
-	KFileItemNode *itemNode = _nodeFromIndex(index);
+
+	KFileItemNode *itemNode = nodeFromIndex(index);
 	QFileInfo fileInfo(itemNode->m_fileName);
 
 	//第一列文字

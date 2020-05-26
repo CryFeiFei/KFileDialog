@@ -17,28 +17,33 @@ KLocalLoadThread::~KLocalLoadThread()
 	qDebug()<<"KLocalLoadThread Destory"<<endl;
 }
 
-void KLocalLoadThread::Init(const QString &path, const QStringList &filter)
+void KLocalLoadThread::clearCache()
 {
 	m_fileInfoList.clear();
 	m_loadCount = 0;
 	m_vecFileItem.clear();
+	m_stopLoad = false;
+}
+
+void KLocalLoadThread::Init(const QString &path, const QStringList &filter)
+{
+	clearCache();
 
 	m_rootPath = path;
 	m_listFilter = filter;
-
 	QDir dir(path);
-//	QStringList filterListType;
-//	filterListType<<"*.*";
 	m_fileInfoList = dir.entryInfoList(filter, QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
 }
 
 void KLocalLoadThread::run()
 {
 	emit workStart();
+	qDebug()<<"emit workStart"<<endl;
 
 //	QTimer *timer = new QTimer(this);
 //	connect(timer, &QTimer::timeout, this, &KLocalLoadThread::timeEmit);
 //	timer->start(2000);
+
 	doWork();
 	qDebug()<<"emit workFinished"<<endl;
 	emit workFinished();

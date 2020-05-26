@@ -25,7 +25,6 @@ public slots:
 	void run();
 
 public:
-
 	void doWork();
 	void timeEmit();
 signals:
@@ -36,6 +35,9 @@ signals:
 
 public slots:
 	void stopLoad(bool stop = true);
+
+private:
+	void clearCache();
 
 private:
 	//resource

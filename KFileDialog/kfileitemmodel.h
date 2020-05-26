@@ -45,10 +45,11 @@ public slots:
 	void addItems(QList<KFileItemNode*> fileInfo);
 
 private:
-	void _createTree();
-	void _destroyTree();
+	void clearCache();
+	void createTree();
+	void destroyTree();
 //	void _createChildren();
-	KFileItemNode* _nodeFromIndex(const QModelIndex& index) const;
+	KFileItemNode* nodeFromIndex(const QModelIndex& index) const;
 
 private:
 	QString m_rootPath;
