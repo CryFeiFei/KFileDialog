@@ -34,8 +34,6 @@ void KFileDialog::chooseDir()
 
 
 	QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-	QString str = QDir::separator() + QString("123");
-	strDesktop += str;
 
 	loadPath = QFileDialog::getExistingDirectory(0, "test", strDesktop);
 

@@ -30,6 +30,8 @@ SOURCES += \
         kfileitemmodel.cpp \
         kfileitemnode.cpp \
         kstackwidget.cpp \
+        load/kloadfileengine.cpp \
+        load/klocalloadfile.cpp \
         main.cpp \
         mainwindow.cpp \
         modelview/kdetailview.cpp \
@@ -40,8 +42,11 @@ HEADERS += \
         kfileitemmodel.h \
         kfileitemnode.h \
         kstackwidget.h \
+        load/kloadfileengine.h \
+        load/klocalloadfile.h \
         mainwindow.h \
         modelview/kdetailview.h \
+        stdafx.h \
         thread/klocalloadthread.h
 
 FORMS += \

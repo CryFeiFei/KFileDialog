@@ -18,34 +18,34 @@ KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/)
 {
 	qRegisterMetaType<QList<KFileItemNode*>>("QList<KFileItemNode*>");
 
-	m_loadThread = new QThread();
-	m_kLocalLoadThread = new KLocalLoadThread();
-	m_kLocalLoadThread->moveToThread(m_loadThread);
+//	m_loadThread = new QThread();
+//	m_kLocalLoadThread = new KLocalLoadThread();
+//	m_kLocalLoadThread->moveToThread(m_loadThread);
 
-	//开始的时候启动线程。
-	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
-	//读取结束之后线程暂停。
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
+//	//开始的时候启动线程。
+//	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
+//	//读取结束之后线程暂停。
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 }
 
 void KFileItemModel::clearCache()
 {
-	if (m_loadThread)
-	{
-		QObject::disconnect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
-	}
+//	if (m_loadThread)
+//	{
+//		QObject::disconnect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
+//	}
 
-	if (m_kLocalLoadThread)
-	{
-		m_kLocalLoadThread->stopLoad();
-		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
-		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
-		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
-		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
-	}
+//	if (m_kLocalLoadThread)
+//	{
+//		m_kLocalLoadThread->stopLoad();
+//		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+//		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+//		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+//		QObject::disconnect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
+//	}
 
 	destroyTree();
 }
@@ -57,22 +57,22 @@ void KFileItemModel::Init(const QString &path, const QStringList& listFilter)
 	m_rootPath = QDir::toNativeSeparators(path);
 	createTree();
 
-	//开始的时候启动线程。
-	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
-	//读取结束之后线程暂停。
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
-	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
+//	//开始的时候启动线程。
+//	QObject::connect(m_loadThread, &QThread::started, m_kLocalLoadThread, &KLocalLoadThread::run);
+//	//读取结束之后线程暂停。
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workDestory, m_kLocalLoadThread, &KLocalLoadThread::deleteLater);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::destroyed, m_loadThread, &QThread::quit);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::working, this, &KFileItemModel::addItems);
+//	QObject::connect(m_kLocalLoadThread, &KLocalLoadThread::workFinished, this, &KFileItemModel::loadFinished);
 
-	m_kLocalLoadThread->Init(path, listFilter);
+//	m_kLocalLoadThread->Init(path, listFilter);
 
-	if (m_loadThread->isRunning() && m_kLocalLoadThread)
-	{
-		m_kLocalLoadThread->run();
-	}
-	else
-		m_loadThread->start();
+//	if (m_loadThread->isRunning() && m_kLocalLoadThread)
+//	{
+//		m_kLocalLoadThread->run();
+//	}
+//	else
+//		m_loadThread->start();
 }
 
 void KFileItemModel::addItems(QList<KFileItemNode*> fileInfo)

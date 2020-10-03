@@ -25,19 +25,6 @@
           <height>0</height>
          </size>
         </property>
-        <widget class="QToolButton" name="toolbutton">
-         <property name="geometry">
-          <rect>
-           <x>170</x>
-           <y>140</y>
-           <width>181</width>
-           <height>121</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
        </widget>
       </item>
      </layout>
