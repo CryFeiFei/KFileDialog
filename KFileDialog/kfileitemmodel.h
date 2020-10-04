@@ -7,17 +7,11 @@
 #include "kfileitemnode.h"
 #include <QObject>
 #include <QStyledItemDelegate>
-#include <QUrl>
 
 class KLocalLoadThread;
-class KLoadFile;
 
 //只加载当前目录的所有的文件以及文件夹
 //由于性能问题，暂时还要把加载过程放到新的线程里。
-// model暂时要有三个状态
-// 1 开始读取
-// 2 读取ing
-// 3 读取结束
 class KFileItemModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -27,10 +21,6 @@ public:
 
 public:
 	void Init(const QString& path, const QStringList& listFilter);
-
-public:
-	void ClearSource();
-	void Init(QUrl)
 
 public:
 	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -60,24 +50,21 @@ private:
 	void destroyTree();
 //	void _createChildren();
 	KFileItemNode* nodeFromIndex(const QModelIndex& index) const;
-	void parserUrl();
 
 private:
 	QString m_rootPath;
 	KFileItemNode* m_rootNode;
 
-	KLoadFile* m_kLoadFile;
+	//定时器
+	//定时添加
+	QTimer* m_timer;
 
-//	//定时器
-//	//定时添加
-//	QTimer* m_timer;
+	// load Thread
+	QThread* m_loadThread;
+	KLocalLoadThread* m_kLocalLoadThread;
 
-//	// load Thread
-//	QThread* m_loadThread;
-//	KLocalLoadThread* m_kLocalLoadThread;
-
-//	// sort Thread
-//	QThread* m_sortThread;
+	// sort Thread
+	QThread* m_sortThread;
 };
 
 #endif // KFILEITEMMODEL_H

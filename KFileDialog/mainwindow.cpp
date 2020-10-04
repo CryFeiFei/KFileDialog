@@ -16,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	showFileDialog();
+
+	connect(ui->toolbutton, &QToolButton::clicked, this, &MainWindow::showFileDialog);
 }
 
 MainWindow::~MainWindow()
