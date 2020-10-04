@@ -47,15 +47,18 @@ void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
 	KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
 
+	QString beforName = node->m_fileName;
 	QFileInfo fileInfo(node->m_fileName);
 	if (lineEdit->text() == fileInfo.fileName())
 		return;
 
-	QString dirPath = fileInfo.absolutePath() + QDir::separator() + lineEdit->text();
+	QString afterName = fileInfo.absolutePath() + QDir::separator() + lineEdit->text();
 
-	qDebug()<<"----"<<dirPath<<endl;
+	qDebug()<<"----"<<afterName<<endl;
+	node->m_fileName = afterName;
 
-	node->m_fileName = dirPath;
+	//kit
+	QFile::rename(beforName, afterName);
 }
 
 KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
