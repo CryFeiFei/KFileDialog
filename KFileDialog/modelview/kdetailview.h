@@ -33,6 +33,7 @@ public:
 
 public slots:
 	void modelLoadFinished();
+	void sortHeader(int);
 
 
 private:

@@ -32,12 +32,10 @@ QWidget* KFileItemDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
 void KFileItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
-
 	if (index.column() != 0)
 		return;
 
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
-
 	KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
 
 	QFileInfo fileInfo(node->m_fileName);
@@ -58,7 +56,6 @@ void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 		return;
 
 	QString afterName = fileInfo.absolutePath() + QDir::separator() + lineEdit->text();
-
 	qDebug()<<"----"<<afterName<<endl;
 	node->m_fileName = afterName;
 
@@ -83,7 +80,7 @@ KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 	horizontalHeader()->setCascadingSectionResizes(true);
 
 	connect(m_model, SIGNAL(loadFinished()), this, SLOT(modelLoadFinished()));
-//	connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
+	connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
 }
 
 void KDetailView::Init(const QString &loadPath, const QStringList &listFilter)
@@ -97,4 +94,9 @@ void KDetailView::Init(const QString &loadPath, const QStringList &listFilter)
 void KDetailView::modelLoadFinished()
 {
 	horizontalHeader()->setEnabled(true);
+}
+
+void KDetailView::sortHeader(int index)
+{
+	qDebug()<<index<<endl;
 }
