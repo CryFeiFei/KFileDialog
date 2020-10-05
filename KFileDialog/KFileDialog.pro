@@ -26,6 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        kfile/kfile.cpp \
         kfiledialog.cpp \
         kfileitemmodel.cpp \
         kfileitemnode.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
         thread/klocalloadthread.cpp
 
 HEADERS += \
+        kfile/kfile.h \
         kfiledialog.h \
         kfileitemmodel.h \
         kfileitemnode.h \

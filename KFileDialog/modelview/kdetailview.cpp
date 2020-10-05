@@ -5,11 +5,16 @@
 #include <QLineEdit>
 #include <QDir>
 #include <QHeaderView>
+#include "kfile/kfile.h"
 
 #include <QDebug>
 
 #include "../kfileitemnode.h"
 #include "../kfileitemmodel.h"
+
+//这里打个备注，这样搞不太好
+//KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
+//自定义一个userrole专门储存fillname
 
 QWidget* KFileItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const
 {
@@ -58,7 +63,7 @@ void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 	node->m_fileName = afterName;
 
 	//kit
-	QFile::rename(beforName, afterName);
+	bool ret = KFile::rename(beforName, afterName);
 }
 
 KDetailView::KDetailView(QWidget* parent) : QTableView(parent)

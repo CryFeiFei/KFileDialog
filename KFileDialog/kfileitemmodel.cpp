@@ -3,14 +3,12 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QFuture>
-#include <QtConcurrent/QtConcurrent>
 #include <QApplication>
 #include <QFileIconProvider>
 #include "thread/klocalloadthread.h"
 #include <QThread>
-#include <QMetaType>
 #include <QLineEdit>
+#include <QDateTime>
 
 KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/)
 	: QAbstractItemModel(parent)
