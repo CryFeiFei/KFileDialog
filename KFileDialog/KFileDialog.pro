@@ -37,6 +37,7 @@ SOURCES += \
         thread/klocalloadthread.cpp
 
 HEADERS += \
+        global.h \
         kfile/kfile.h \
         kfiledialog.h \
         kfileitemmodel.h \

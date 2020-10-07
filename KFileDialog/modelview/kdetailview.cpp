@@ -20,10 +20,9 @@ QWidget* KFileItemDelegate::createEditor(QWidget* parent, const QStyleOptionView
 {
 	if (index.column() == 0)
 	{
-		KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
+		QString fileName = index.data(Qt::DisplayRole).toString();
 		QLineEdit* lineEdit = new QLineEdit(parent);
-		QFileInfo fileInfo(node->m_fileName);
-		lineEdit->setPlaceholderText(fileInfo.fileName());
+		lineEdit->setPlaceholderText(fileName);
 		return lineEdit;
 	}
 	else
@@ -36,10 +35,8 @@ void KFileItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 		return;
 
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
-	KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
-
-	QFileInfo fileInfo(node->m_fileName);
-	lineEdit->setText(fileInfo.fileName());
+	QString strFileName = index.data(Qt::DisplayRole).toString();
+	lineEdit->setText(strFileName);
 }
 
 void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
@@ -48,20 +45,23 @@ void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 		return;
 
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
-	KFileItemNode* node = reinterpret_cast<KFileItemNode*>(index.internalPointer());
 
-	QString beforName = node->m_fileName;
-	QFileInfo fileInfo(node->m_fileName);
-	if (lineEdit->text() == fileInfo.fileName())
+	QString beforName = index.data(KFileItemModel::FilePathRole).toString();
+	QString beforBaseName = index.data(Qt::DisplayRole).toString();
+	if (lineEdit->text() == beforBaseName)
 		return;
 
+	QFileInfo fileInfo(beforName);
 	QString afterName = fileInfo.absolutePath() + QDir::separator() + lineEdit->text();
 	qDebug()<<"----"<<afterName<<endl;
-	node->m_fileName = afterName;
+	model->setData(index, afterName, KFileItemModel::FilePathRole);
 
 	//kit
 	bool ret = KFile::rename(beforName, afterName);
 }
+
+//--------------------------------------
+//--------------------------------------
 
 KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 {
@@ -70,14 +70,18 @@ KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 //	filterListType<<"*.*";
 //	m_model->Init(strDesktop, filterListType);
 
-	setModel(m_model);
+	m_sortModel = new MySortFilterProxyModel(this);
+	m_sortModel->setSourceModel(m_model);
+
+	setModel(m_sortModel);
 	KFileItemDelegate* fileItemDelegate = new KFileItemDelegate(this);
 	setItemDelegate(fileItemDelegate);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
 	setShowGrid(false); //不显示格子线
-	horizontalHeader()->setStretchLastSection(true);
-	horizontalHeader()->setEnabled(false);
-	horizontalHeader()->setCascadingSectionResizes(true);
+//	horizontalHeader()->setStretchLastSection(true);
+//	horizontalHeader()->setEnabled(false);
+//	horizontalHeader()->setCascadingSectionResizes(true);
+	this->setSortingEnabled(true);
 
 	connect(m_model, SIGNAL(loadFinished()), this, SLOT(modelLoadFinished()));
 	connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
@@ -96,7 +100,9 @@ void KDetailView::modelLoadFinished()
 	horizontalHeader()->setEnabled(true);
 }
 
+static int s_index = 0;
 void KDetailView::sortHeader(int index)
 {
-	qDebug()<<index<<endl;
+	s_index ++;
+	qDebug()<<s_index<<endl;
 }

@@ -7,8 +7,34 @@
 #include "kfileitemnode.h"
 #include <QObject>
 #include <QStyledItemDelegate>
+#include <QSortFilterProxyModel>
+
+#include "global.h"
+
+
+class MySortFilterProxyModel : public QSortFilterProxyModel
+{
+	Q_OBJECT
+
+public:
+	MySortFilterProxyModel(QObject *parent = 0);
+	void setSortType()
+	{
+		if (m_sortType)
+			m_sortType = 0;
+		else
+			m_sortType = 1;
+	}
+protected:
+//	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
+private:
+	int m_sortType;
+};
 
 class KLocalLoadThread;
+
 
 //只加载当前目录的所有的文件以及文件夹
 //由于性能问题，暂时还要把加载过程放到新的线程里。
@@ -19,9 +45,18 @@ public:
 	KFileItemModel(QObject* parent = nullptr);
 	~KFileItemModel(){}
 
+	enum Roles
+	{
+		FileIconRole = Qt::DecorationRole,
+		FilePathRole = Qt::UserRole + 1,
+		FileNameRole = Qt::UserRole + 2,
+		FilePermissions = Qt::UserRole + 3
+	};
+
 public:
 	void Init(const QString& path, const QStringList& listFilter);
 
+	//model
 public:
 	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex& parent) const;
@@ -29,14 +64,14 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const;
 	virtual QModelIndex parent(const QModelIndex& index) const;
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
-
-
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-	//这个函数不写了，
-//	virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-//	virtual bool canFetchMore(const QModelIndex &parent) const;
-//	virtual void fetchMore(const QModelIndex &parent);
+//protected:
+//	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+//	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
+
 
 signals:
 	void loadFinished();
@@ -58,13 +93,10 @@ private:
 	//定时器
 	//定时添加
 	QTimer* m_timer;
-
 	// load Thread
 	QThread* m_loadThread;
 	KLocalLoadThread* m_kLocalLoadThread;
 
-	// sort Thread
-	QThread* m_sortThread;
 };
 
 #endif // KFILEITEMMODEL_H

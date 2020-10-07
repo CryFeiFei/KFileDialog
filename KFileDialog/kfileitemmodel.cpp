@@ -9,6 +9,26 @@
 #include <QThread>
 #include <QLineEdit>
 #include <QDateTime>
+#include <QSortFilterProxyModel>
+
+////
+MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent)
+	: QSortFilterProxyModel(parent)
+{
+}
+
+
+
+bool MySortFilterProxyModel::lessThan(const QModelIndex &left,
+									  const QModelIndex &right) const
+{
+	QString strLeft = left.data(Qt::DisplayRole).toString();
+	QString strRight = right.data(Qt::DisplayRole).toString();
+	return strLeft.size() < strRight.size();
+}
+
+
+//------------------------------------------
 
 KFileItemModel::KFileItemModel(QObject* parent/* = nullptr*/)
 	: QAbstractItemModel(parent)
@@ -189,6 +209,12 @@ QVariant KFileItemModel::data(const QModelIndex &index, int role) const
 		return QVariant(fileInfo.fileName());
 	}
 
+
+	if (role == FilePathRole && index.column() == 0)
+	{
+		return QVariant(fileInfo.absoluteFilePath());
+	}
+
 	//第一列图标
 	if (role == Qt::DecorationRole && index.column() == 0)
 	{
@@ -258,6 +284,30 @@ Qt::ItemFlags KFileItemModel::flags(const QModelIndex& index) const
 
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
+
+bool KFileItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+	if (!index.isValid())
+		return false;
+
+	if (index.column() == 0 && role == FilePathRole)
+	{
+		QString strFilePath = value.toString();
+		KFileItemNode *itemNode = nodeFromIndex(index);
+		itemNode->m_fileName = strFilePath;
+
+		return true;
+	}
+
+	return false;
+}
+
+//bool KFileItemModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+//{
+//	QString strLeft =  left.data(Qt::DisplayRole).toString();
+//	QString strRight = right.data(Qt::DisplayRole).toString();
+//	return strLeft > strRight;
+//}
 
 //bool KFileItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 //{

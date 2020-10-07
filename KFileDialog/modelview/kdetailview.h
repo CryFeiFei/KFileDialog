@@ -21,6 +21,8 @@ public:
 	void setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
 };
 
+class MySortFilterProxyModel;
+
 class KDetailView : public QTableView
 {
 	Q_OBJECT
@@ -38,6 +40,7 @@ public slots:
 
 private:
 	KFileItemModel* m_model;
+	MySortFilterProxyModel* m_sortModel;
 };
 
 #endif // DETAILVIEW_H
