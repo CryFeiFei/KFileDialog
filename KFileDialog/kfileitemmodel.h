@@ -12,19 +12,12 @@
 #include "global.h"
 
 
-class MySortFilterProxyModel : public QSortFilterProxyModel
+class KFileFilterProxyModel : public QSortFilterProxyModel
 {
 	Q_OBJECT
 
 public:
-	MySortFilterProxyModel(QObject *parent = 0);
-	void setSortType()
-	{
-		if (m_sortType)
-			m_sortType = 0;
-		else
-			m_sortType = 1;
-	}
+	KFileFilterProxyModel(QObject *parent = 0);
 protected:
 //	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;

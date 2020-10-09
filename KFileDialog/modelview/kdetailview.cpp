@@ -60,6 +60,17 @@ void KFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 	bool ret = KFile::rename(beforName, afterName);
 }
 
+void KFileItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QStyleOptionViewItem viewOption(option);
+	initStyleOption(&viewOption, index);
+	if (option.state.testFlag(QStyle::State_HasFocus))
+	{
+		viewOption.state = viewOption.state ^ QStyle::State_HasFocus;
+	}
+	QStyledItemDelegate::paint(painter, viewOption, index);
+}
+
 //--------------------------------------
 //--------------------------------------
 
@@ -70,7 +81,7 @@ KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 //	filterListType<<"*.*";
 //	m_model->Init(strDesktop, filterListType);
 
-	m_sortModel = new MySortFilterProxyModel(this);
+	m_sortModel = new KFileFilterProxyModel(this);
 	m_sortModel->setSourceModel(m_model);
 
 	setModel(m_sortModel);
@@ -89,6 +100,7 @@ KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 
 void KDetailView::Init(const QString &loadPath, const QStringList &listFilter)
 {
+	m_sortModel->clear();
 	if (m_model)
 	{
 		m_model->Init(loadPath, listFilter);

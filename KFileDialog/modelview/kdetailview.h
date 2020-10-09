@@ -16,12 +16,14 @@ public:
 
 	~KFileItemDelegate() {}
 
-	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	void setEditorData(QWidget* editor, const QModelIndex& index) const;
-	void setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+	void setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
+	void paint(QPainter *painter,
+			   const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
-class MySortFilterProxyModel;
+class KFileFilterProxyModel;
 
 class KDetailView : public QTableView
 {
@@ -40,7 +42,7 @@ public slots:
 
 private:
 	KFileItemModel* m_model;
-	MySortFilterProxyModel* m_sortModel;
+	KFileFilterProxyModel* m_sortModel;
 };
 
 #endif // DETAILVIEW_H

@@ -12,14 +12,14 @@
 #include <QSortFilterProxyModel>
 
 ////
-MySortFilterProxyModel::MySortFilterProxyModel(QObject *parent)
+KFileFilterProxyModel::KFileFilterProxyModel(QObject *parent)
 	: QSortFilterProxyModel(parent)
 {
 }
 
 
 
-bool MySortFilterProxyModel::lessThan(const QModelIndex &left,
+bool KFileFilterProxyModel::lessThan(const QModelIndex &left,
 									  const QModelIndex &right) const
 {
 	QString strLeft = left.data(Qt::DisplayRole).toString();
