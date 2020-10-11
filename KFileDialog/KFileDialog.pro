@@ -34,7 +34,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         modelview/kdetailview.cpp \
-        thread/klocalloadthread.cpp
+        thread/klocalloadthread.cpp \
+        watcher/kfilesystemwatcher.cpp
 
 HEADERS += \
         global.h \
@@ -45,7 +46,8 @@ HEADERS += \
         kstackwidget.h \
         mainwindow.h \
         modelview/kdetailview.h \
-        thread/klocalloadthread.h
+        thread/klocalloadthread.h \
+        watcher/kfilesystemwatcher.h
 
 FORMS += \
         kfiledialog.ui \

@@ -93,6 +93,7 @@ KDetailView::KDetailView(QWidget* parent) : QTableView(parent)
 //	horizontalHeader()->setEnabled(false);
 //	horizontalHeader()->setCascadingSectionResizes(true);
 	this->setSortingEnabled(true);
+	this->setEditTriggers(EditTrigger::NoEditTriggers);
 
 	connect(m_model, SIGNAL(loadFinished()), this, SLOT(modelLoadFinished()));
 	connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortHeader(int)));
@@ -112,9 +113,8 @@ void KDetailView::modelLoadFinished()
 	horizontalHeader()->setEnabled(true);
 }
 
-static int s_index = 0;
+
 void KDetailView::sortHeader(int index)
 {
-	s_index ++;
-	qDebug()<<s_index<<endl;
+
 }
